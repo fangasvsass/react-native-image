@@ -49,6 +49,13 @@ export type Source = {
     cache?: Cache
 }
 
+export type DefaultSource = {
+    uri?: string
+    headers?: { [key: string]: string }
+    priority?: Priority
+    cache?: Cache
+}
+
 export interface OnLoadEvent {
     nativeEvent: {
         width: number
@@ -80,6 +87,7 @@ export interface ImageStyle extends FlexStyle, TransformsStyle, ShadowStyleIOS {
 
 export interface FastImageProps {
     source: Source | number
+    defaultSource: DefaultSource | number
     resizeMode?: ResizeMode
     fallback?: boolean
 
@@ -129,6 +137,7 @@ export interface FastImageProps {
 
 function FastImageBase({
     source,
+    defaultSource,
     tintColor,
     onLoadStart,
     onProgress,
@@ -143,6 +152,7 @@ function FastImageBase({
     ...props
 }: FastImageProps & { forwardedRef: React.Ref<any> }) {
     const resolvedSource = Image.resolveAssetSource(source as any)
+    const resolvedDefaultSource = Image.resolveAssetSource(defaultSource as any)
 
     if (fallback) {
         return (
@@ -151,6 +161,7 @@ function FastImageBase({
                     {...props}
                     style={StyleSheet.absoluteFill}
                     source={resolvedSource}
+                    defaultSource={resolvedDefaultSource}
                     onLoadStart={onLoadStart}
                     onProgress={onProgress}
                     onLoad={onLoad as any}
@@ -170,6 +181,7 @@ function FastImageBase({
                 tintColor={tintColor}
                 style={StyleSheet.absoluteFill}
                 source={resolvedSource}
+                defaultSource={resolvedDefaultSource}
                 onFastImageLoadStart={onLoadStart}
                 onFastImageProgress={onProgress}
                 onFastImageLoad={onLoad}

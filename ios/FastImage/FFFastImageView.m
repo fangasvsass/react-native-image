@@ -1,4 +1,5 @@
 #import "FFFastImageView.h"
+#import <SDWebImage/SDImageCache.h>
 
 @interface FFFastImageView()
 
@@ -102,6 +103,12 @@
     }
 }
 
+- (void)setDefaultSource:(FFFastImageSource *)defaultSource {
+    if (_defaultSource != defaultSource) {
+        _defaultSource = defaultSource;
+    }
+}
+
 - (void)didSetProps:(NSArray<NSString *> *)changedProps
 {
     if (_needsReload) {
@@ -186,8 +193,13 @@
 
 - (void)downloadImage:(FFFastImageSource *) source options:(SDWebImageOptions) options {
     __weak typeof(self) weakSelf = self; // Always use a weak reference to self in blocks
+    UIImage * placeholderImage=nil;
+    if(_defaultSource){
+      NSString * defaultUrl = [_defaultSource.url absoluteString];
+      placeholderImage = [[SDImageCache sharedImageCache]imageFromCacheForKey:defaultUrl];
+    }
     [self sd_setImageWithURL:_source.url
-            placeholderImage:nil
+            placeholderImage:placeholderImage
                      options:options
                     progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
                         if (weakSelf.onFastImageProgress) {

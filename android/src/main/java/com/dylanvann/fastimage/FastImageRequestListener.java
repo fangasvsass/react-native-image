@@ -22,7 +22,7 @@ public class FastImageRequestListener implements RequestListener<Drawable> {
     }
     
     @Override
-    public boolean onLoadFailed(@android.support.annotation.Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+    public boolean onLoadFailed(@androidx.annotation.Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
         if (!(target instanceof ImageViewTarget)) {
             return false;
         }

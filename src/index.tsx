@@ -90,6 +90,7 @@ export interface FastImageProps {
     defaultSource: DefaultSource | number
     resizeMode?: ResizeMode
     fallback?: boolean
+    zoom?: boolean
 
     onLoadStart?(): void
 
@@ -100,6 +101,8 @@ export interface FastImageProps {
     onError?(): void
 
     onLoadEnd?(): void
+
+    onPhotoTapListener?(): void
 
     /**
      * onLayout function
@@ -144,8 +147,10 @@ function FastImageBase({
     onLoad,
     onError,
     onLoadEnd,
+    onPhotoTapListener,
     style,
     fallback,
+    zoom,
     children,
     resizeMode = 'cover',
     forwardedRef,
@@ -171,6 +176,23 @@ function FastImageBase({
                 />
                 {children}
             </View>
+        )
+    }
+
+    if (zoom) {
+        return (
+            <PhotoView
+                {...props}
+                style={style}
+                source={resolvedSource}
+                defaultSource={resolvedDefaultSource}
+                onFastImageLoadStart={onLoadStart}
+                onFastImageProgress={onProgress}
+                onFastImageLoad={onLoad}
+                onFastImageError={onError}
+                onFastImageLoadEnd={onLoadEnd}
+                onPhotoTapListener={onPhotoTapListener}
+            />
         )
     }
 
@@ -243,5 +265,11 @@ const FastImageView = (requireNativeComponent as any)(
         },
     },
 )
+
+const PhotoView = (requireNativeComponent as any)('PhotoView', null, {
+    nativeOnly: {
+        onPhotoTapListener: true,
+    },
+})
 
 export default FastImage

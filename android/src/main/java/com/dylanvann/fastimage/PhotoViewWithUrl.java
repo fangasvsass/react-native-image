@@ -1,6 +1,8 @@
 package com.dylanvann.fastimage;
 
 import android.content.Context;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.bumptech.glide.Priority;
@@ -26,15 +28,26 @@ class PhotoViewWithUrl extends PhotoView {
 
     public PhotoViewWithUrl(Context context) {
         super(context);
-        this.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
+        this.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
             @Override
-            public void onPhotoTap(View view, float x, float y) {
+            public boolean onSingleTapConfirmed(MotionEvent e) {
                 PhotoViewWithUrl.this.onReceiveNativeEvent();
+                return true;
             }
 
             @Override
-            public void onOutsidePhotoTap() {
+            public boolean onDoubleTap(MotionEvent e) {
+                if (PhotoViewWithUrl.this.getScale() > PhotoView.DEFAULT_MIN_SCALE) {
+                    PhotoViewWithUrl.this.setScale(PhotoView.DEFAULT_MIN_SCALE, e.getX(), e.getY(), true);
+                } else {
+                    PhotoViewWithUrl.this.setScale(PhotoView.DEFAULT_MAX_SCALE, e.getX(), e.getY(), true);
+                }
+                return true;
+            }
 
+            @Override
+            public boolean onDoubleTapEvent(MotionEvent e) {
+                return false;
             }
         });
     }

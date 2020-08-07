@@ -3,6 +3,9 @@
 
 #import <SDWebImage/SDWebImagePrefetcher.h>
 
+#import <SDWebImage/SDImageCache.h>
+
+
 @implementation FFFastImageViewManager
 
 RCT_EXPORT_MODULE(FastImageView)
@@ -34,6 +37,13 @@ RCT_EXPORT_METHOD(preload:(nonnull NSArray<FFFastImageSource *> *)sources)
 
     [[SDWebImagePrefetcher sharedImagePrefetcher] prefetchURLs:urls];
 }
+
+
+RCT_EXPORT_METHOD(setMaxMemoryCount:(NSUInteger)count)
+{
+    [SDImageCache sharedImageCache].config.maxMemoryCount = count;
+}
+
 
 @end
 

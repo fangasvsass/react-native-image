@@ -27,105 +27,81 @@ import javax.annotation.Nullable;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
-class FastImageViewManager extends SimpleViewManager<ImageViewWithUrl> {
+class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl>  {
     private static final String REACT_CLASS = "FastImageView";
     private static RequestManager requestManager = null;
     private RequestOptions circleCrop = RequestOptions.circleCropTransform();
     private RequestOptions fitCenter = RequestOptions.fitCenterTransform();
     private MultiTransformation multiTransformation = new MultiTransformation(new FitCenter(), new CircleCrop());
-    
+
     @Override
     public String getName() {
         return REACT_CLASS;
     }
-    
+
     @Override
-    protected ImageViewWithUrl createViewInstance(ThemedReactContext reactContext) {
+    protected FastImageViewWithUrl createViewInstance(ThemedReactContext reactContext) {
         if (requestManager == null) {
             requestManager = Glide.with(reactContext.getApplicationContext());
         }
-        return new ImageViewWithUrl(reactContext);
+        return new FastImageViewWithUrl(reactContext);
     }
-    
+
     @ReactProp(name = "source")
-    public void setSrc(ImageViewWithUrl view, @Nullable ReadableMap source) {
+    public void setSrc(FastImageViewWithUrl view, @Nullable ReadableMap source) {
         if (source == null) {
             return;
         }
         // Get the GlideUrl which contains header info.
-        GlideUrl glideUrl = FastImageViewConverter.glideUrl(source);
-        view.glideUrl = glideUrl;
-        // Get priority.
-        final Priority priority = FastImageViewConverter.priority(source);
-        view.priority = priority;
+        final FastImageSource imageSource = FastImageViewConverter.getImageSource(view.getContext(), source);
+        view.glideUrl = imageSource;
+
     }
-    
+
     @ReactProp(name = ViewProps.RESIZE_MODE)
-    public void setResizeMode(ImageViewWithUrl view, String resizeMode) {
+    public void setResizeMode(FastImageViewWithUrl view, String resizeMode) {
         view.resizeMode = resizeMode;
     }
-    
-    
+
+
     @Override
-    protected void onAfterUpdateTransaction(ImageViewWithUrl view) {
+    protected void onAfterUpdateTransaction(FastImageViewWithUrl view) {
         RequestOptions requestOptions = new RequestOptions();
-        if (view.circle) {
-            requestOptions = requestOptions.apply(circleCrop);
-        }
-        requestOptions.priority(view.priority);
-        
-        if (view.circle && "cover".equals(view.resizeMode)) {
-            requestOptions = requestOptions.apply(bitmapTransform(multiTransformation));
-        } else {
-            if (view.circle) {
-                requestOptions = requestOptions.apply(circleCrop);
-            } else if ("cover".equals(view.resizeMode)) {
-                requestOptions = requestOptions.apply(fitCenter);
-            }
-            ImageViewWithUrl.ScaleType scaleType = FastImageViewConverter.scaleType(view.resizeMode);
-            view.setScaleType(scaleType);
-        }
-        
+
+        FastImageViewWithUrl.ScaleType scaleType = FastImageViewConverter.getScaleType(view.resizeMode);
+        view.setScaleType(scaleType);
+
         if (TextUtils.isEmpty(view.defaultSource)) {
+
             requestManager
-            .load(view.glideUrl.toStringUrl())
-            .apply(requestOptions)
-            .into(view);
-            
+                    .load(view.glideUrl.getSourceForLoad())
+                    .apply(requestOptions)
+                    .into(view);
+
         } else
             requestManager
-            .load(view.glideUrl.toStringUrl())
-            .thumbnail(requestManager.load(view.defaultSource))
-            .apply(requestOptions)
-            .into(view);
+                    .load(view.glideUrl.getSourceForLoad())
+                    .thumbnail(requestManager.load(view.defaultSource))
+                    .apply(requestOptions)
+                    .into(view);
         super.onAfterUpdateTransaction(view);
     }
-    
-    
-    @ReactProp(name = "circle")
-    public void setCircle(ImageViewWithUrl view, Boolean circle) {
-        try {
-            view.circle = circle;
-        } catch (Exception e) {
-        }
-    }
-    
+
+
     @ReactProp(name = "defaultSource")
-    public void setDefaultSource(ImageViewWithUrl view, @Nullable ReadableMap defaultSource) {
+    public void setDefaultSource(FastImageViewWithUrl view, @Nullable ReadableMap defaultSource) {
         try {
             view.defaultSource = defaultSource.getString("uri");
         } catch (Exception e) {
         }
     }
-    
+
     @Override
-    public void onDropViewInstance(ImageViewWithUrl view) {
+    public void onDropViewInstance(FastImageViewWithUrl view) {
         // This will cancel existing requests.
         requestManager.clear(view);
         super.onDropViewInstance(view);
     }
-    
-    
+
+
 }
-
-

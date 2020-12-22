@@ -55,17 +55,37 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl>  {
 
         if (TextUtils.isEmpty(view.defaultSource)) {
 
-            requestManager
-                    .load(view.glideUrl.getSourceForLoad())
-                    .apply(requestOptions)
-                    .into(view);
+            if(view.dontTransform){
+                requestManager
+                        .load(view.glideUrl.getSourceForLoad())
+                        .dontTransform()
+                        .apply(requestOptions)
+                        .into(view);
+            }else{
+                requestManager
+                        .load(view.glideUrl.getSourceForLoad())
+                        .apply(requestOptions)
+                        .into(view);
+            }
 
-        } else
-            requestManager
-                    .load(view.glideUrl.getSourceForLoad())
-                    .thumbnail(requestManager.load(view.defaultSource))
-                    .apply(requestOptions)
-                    .into(view);
+        } else{
+
+            if(view.dontTransform){
+                requestManager
+                        .load(view.glideUrl.getSourceForLoad())
+                        .dontTransform()
+                        .thumbnail(requestManager.load(view.defaultSource))
+                        .apply(requestOptions)
+                        .into(view);
+            }else{
+                requestManager
+                        .load(view.glideUrl.getSourceForLoad())
+                        .thumbnail(requestManager.load(view.defaultSource))
+                        .apply(requestOptions)
+                        .into(view);
+            }
+        }
+
         super.onAfterUpdateTransaction(view);
     }
 
@@ -77,6 +97,15 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl>  {
         } catch (Exception e) {
         }
     }
+
+    @ReactProp(name = "dontTransform")
+    public void dontTransform(FastImageViewWithUrl view, @Nullable ReadableMap map) {
+        try {
+            view.dontTransform = map.getBoolean("dontTransform");
+        } catch (Exception e) {
+        }
+    }
+
 
     @Override
     public void onDropViewInstance(FastImageViewWithUrl view) {

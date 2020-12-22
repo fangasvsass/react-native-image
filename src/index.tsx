@@ -91,6 +91,7 @@ export interface FastImageProps {
     resizeMode?: ResizeMode
     fallback?: boolean
     zoom?: boolean
+    dontTransform?: boolean
 
     onLoadStart?(): void
 
@@ -141,6 +142,7 @@ export interface FastImageProps {
 function FastImageBase({
     source,
     defaultSource,
+    dontTransform,
     tintColor,
     onLoadStart,
     onProgress,
@@ -201,6 +203,7 @@ function FastImageBase({
             <FastImageView
                 {...props}
                 tintColor={tintColor}
+                dontTransform={dontTransform}
                 style={StyleSheet.absoluteFill}
                 source={resolvedSource}
                 defaultSource={resolvedDefaultSource}

@@ -14,7 +14,8 @@ class FastImageViewWithUrl extends ImageView {
 
     public String resizeMode;
 
-
+    public boolean dontTransform;
+	
     public FastImageViewWithUrl(Context context) {
         super(context);
     }
